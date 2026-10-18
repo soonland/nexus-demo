@@ -1,0 +1,94 @@
+name: Claude Code
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    # Only the repo owner may invoke @claude. The association is checked on the author of the
+    # triggering content for each event type. Do not use github.event.issue.author_association
+    # for comment events: it describes whoever opened the issue/PR, so any commenter on an
+    # owner-authored thread would pass the gate.
+    if: |
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.comment.author_association == 'OWNER' &&
+        contains(github.event.comment.body, '@claude')
+      ) || (
+        github.event_name == 'pull_request_review_comment' &&
+        github.event.comment.author_association == 'OWNER' &&
+        contains(github.event.comment.body, '@claude')
+      ) || (
+        github.event_name == 'pull_request_review' &&
+        github.event.review.author_association == 'OWNER' &&
+        contains(github.event.review.body, '@claude')
+      ) || (
+        github.event_name == 'issues' &&
+        github.event.issue.author_association == 'OWNER' &&
+        (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read # Required for Claude to read CI results on PRs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@5eb090f3c3afd701a0672cd32981197ca27688f6 # v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          # Allows Claude to read CI results on PRs
+          additional_permissions: |
+            actions: read
+
+          prompt: |
+            If triggered from a PR comment or review:
+            - Perform the action described in the comment directly.
+
+            If triggered from an issue comment or issue body containing "@claude implement":
+            - If `.github/skills/implement-feature.md` exists, read it and follow it exactly.
+              Otherwise implement the issue on a new `feat/<slug>` branch, add tests, and open a
+              pull request that includes `Closes #<issue number>`.
+            - The issue that triggered this workflow is the current issue context.
+
+            If triggered from an issue body or comment containing "@claude" (but NOT "implement"):
+            - Read the issue body carefully.
+            - Explore the codebase to understand the relevant files and existing patterns.
+            - Post a comment on the issue with a structured implementation plan in this format:
+
+            ## Scope
+            <one or two sentences describing what needs to change and which package(s) are affected>
+
+            ## Tasks
+            - [ ] <specific file path or component to create/modify>
+            - [ ] <next task>
+            - [ ] Tests and checks pass
+
+            ## Dependencies
+            <other issues that must be merged first, or "None">
+
+            ## Blocks
+            <issues that cannot start until this is merged, or "None">
+
+            ## Known Limitations
+            <edge cases, deferred work, or constraints worth flagging>
+
+            Do NOT write or commit any code. Post the plan as a comment only.
+
+          claude_args: --model claude-sonnet-5-5 --max-turns 50
