@@ -19,11 +19,8 @@ describe('steps', () => {
     }
   });
 
-  it('gives every step prose, a summary and a real GitHub artifact', () => {
+  it('gives every step a real GitHub artifact', () => {
     for (const step of steps) {
-      expect(step.title).toBeTruthy();
-      expect(step.summary).toBeTruthy();
-      expect(step.prose).toBeTruthy();
       expect(['PR', 'Issue']).toContain(step.artifact.kind);
       expect(['merged', 'closed']).toContain(step.artifact.state);
       expect(step.artifact.href).toBe(

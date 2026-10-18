@@ -99,6 +99,7 @@ main {
 }
 
 .bar nav {
+  align-items: center;
   display: flex;
   gap: 1.5rem;
 }
@@ -290,4 +291,15 @@ main {
     grid-template-columns: minmax(0, 1fr);
     padding: 2.5rem 0;
   }
+}
+
+.bar nav .lang {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.1rem 0.7rem;
+}
+
+.bar nav .lang:hover {
+  border-color: var(--muted);
 }
