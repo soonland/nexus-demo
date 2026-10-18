@@ -9,7 +9,11 @@ Look at the closed issues and merged pull requests to see what each step produce
 2. `nexus:feature-spec` turned a one-line idea into a spec issue.
 3. `nexus:implement-feature` planned, coded, tested and opened the PR.
 
+The walkthrough is also a small single-page site: https://soonland.github.io/nexus-demo/
+
 ```
 npm ci
 npm test
+npm run dev    # local dev server
+npm run build  # production build into dist/
 ```
