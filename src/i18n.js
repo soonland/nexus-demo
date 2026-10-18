@@ -38,7 +38,7 @@ export const messages = {
         title: 'Plan the work',
         summary: 'one issue per package, or skip the split',
         prose:
-          'Splits a spec into one implementation issue per package. This spec touches a single package, so the plan recommended skipping the split and implementing the spec directly.',
+          'Splits a spec into one implementation issue per package. This spec touches a single package, so the split was skipped, no child issues were created, and the spec was implemented directly.',
       },
       'implement-feature': {
         title: 'Build it and open the PR',
@@ -85,7 +85,7 @@ export const messages = {
         title: 'Planifier le travail',
         summary: 'un ticket par package, ou pas de découpage',
         prose:
-          'Découpe une spécification en un ticket d’implémentation par package. Celle-ci ne touche qu’un seul package : le plan a donc recommandé de ne pas la découper et de l’implémenter directement.',
+          'Découpe une spécification en un ticket d’implémentation par package. Celle-ci ne touche qu’un seul package : le découpage a donc été sauté, aucun ticket enfant n’a été créé et la spécification a été implémentée directement.',
       },
       'implement-feature': {
         title: 'Construire et ouvrir la PR',
