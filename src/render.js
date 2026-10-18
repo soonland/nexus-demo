@@ -4,14 +4,14 @@ import { MARKETPLACE_URL, REPO_URL } from './steps.js';
 const escapeHtml = (text) =>
   text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-export function renderHeader(t, lang, slug = null) {
+export function renderHeader(t, lang) {
   const { switchTo } = t;
   return `<div class="bar">
 <a class="brand" href="${hrefFor(lang)}">nexus demo</a>
 <nav aria-label="${escapeHtml(t.linksLabel)}">
 <a href="${hrefFor(lang, 'setup')}">${escapeHtml(t.stepsLink)}</a>
 <a href="${REPO_URL}">${escapeHtml(t.githubLink)}</a>
-<a class="lang" href="${hrefFor(switchTo.lang, slug)}" hreflang="${switchTo.lang}" lang="${switchTo.lang}" title="${escapeHtml(switchTo.title)}">${escapeHtml(switchTo.label)}</a>
+<a class="lang" href="${hrefFor(switchTo.lang)}" hreflang="${switchTo.lang}" lang="${switchTo.lang}" title="${escapeHtml(switchTo.title)}">${escapeHtml(switchTo.label)}</a>
 </nav>
 </div>`;
 }

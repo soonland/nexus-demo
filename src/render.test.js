@@ -6,11 +6,11 @@ import { steps } from './steps.js';
 const { en, fr } = messages;
 
 describe('renderHeader', () => {
-  it('links to the steps, GitHub and the other language, keeping the current step', () => {
-    const html = renderHeader(en, 'en', 'feature-spec');
+  it('links to the steps, GitHub and the top of the other language', () => {
+    const html = renderHeader(en, 'en');
     expect(html).toContain('href="#/en/setup"');
     expect(html).toContain('href="https://github.com/soonland/nexus-demo"');
-    expect(html).toContain('href="#/fr/feature-spec" hreflang="fr" lang="fr"');
+    expect(html).toContain('href="#/fr" hreflang="fr" lang="fr"');
     expect(html).toContain('>Français</a>');
   });
 

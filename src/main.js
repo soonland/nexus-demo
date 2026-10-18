@@ -23,7 +23,7 @@ function go() {
   const lang = detectLang({ hashLang, stored: readStoredLang(), preferred: navigator.languages ?? [] });
   const t = messages[lang];
 
-  header.innerHTML = renderHeader(t, lang, slug);
+  header.innerHTML = renderHeader(t, lang);
   if (lang !== renderedLang) {
     renderedLang = lang;
     document.documentElement.lang = lang;
