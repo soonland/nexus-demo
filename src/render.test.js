@@ -1,51 +1,72 @@
 import { describe, expect, it } from 'vitest';
-import { renderNav, renderStep } from './render.js';
+import { renderHeader, renderHero, renderInstall, renderSteps } from './render.js';
 
 const steps = [
-  { slug: 'home', title: 'Home', prose: 'p', link: { label: 'l', href: 'https://x.test' } },
-  { slug: 'setup', title: 'Set <up>', prose: 'p', link: { label: 'l', href: 'https://x.test' } },
+  {
+    slug: 'setup',
+    title: 'Set <up>',
+    command: '/nexus:setup',
+    summary: 'labels',
+    prose: 'Some <b>prose</b>',
+    artifact: { kind: 'PR', number: 1, title: 'chore & more', state: 'merged', href: 'https://x.test/1' },
+  },
+  {
+    slug: 'feature-spec',
+    title: 'Spec',
+    command: '/nexus:feature-spec',
+    summary: 'issue',
+    prose: 'p',
+    artifact: { kind: 'Issue', number: 2, title: 't', state: 'closed', href: 'https://x.test/2' },
+  },
 ];
 
-describe('renderNav', () => {
-  it('links every step and marks only the active one as current', () => {
-    const html = renderNav(steps, 'setup');
-    expect(html).toContain('href="#/home"');
-    expect(html).toContain('href="#/setup" aria-current="page"');
-    expect(html.match(/aria-current/g)).toHaveLength(1);
-  });
-
-  it('escapes titles', () => {
-    expect(renderNav(steps, 'home')).toContain('Set &lt;up&gt;');
-  });
-
-  it('prefers the short nav label', () => {
-    expect(renderNav([{ ...steps[0], nav: 'Overview' }], 'home')).toContain('>Overview</a>');
+describe('renderHeader', () => {
+  it('links to the steps and to GitHub', () => {
+    const html = renderHeader();
+    expect(html).toContain('href="#/setup"');
+    expect(html).toContain('href="https://github.com/soonland/nexus-demo"');
   });
 });
 
-describe('renderStep', () => {
-  it('shows the command only for pipeline steps', () => {
-    expect(renderStep(steps[0])).not.toContain('class="command"');
-    expect(renderStep({ ...steps[0], command: '/nexus:setup' })).toContain('<code>/nexus:setup</code>');
+describe('renderHero', () => {
+  it('shows one terminal line per step, linking to its section', () => {
+    const html = renderHero(steps);
+    expect(html).toContain('<h1');
+    expect(html).toContain('href="#/setup"');
+    expect(html).toContain('/nexus:feature-spec');
+    expect(html.match(/<li>/g)).toHaveLength(2);
+  });
+});
+
+describe('renderSteps', () => {
+  it('renders a section per step with id, count and command', () => {
+    const html = renderSteps(steps);
+    expect(html).toContain('id="setup"');
+    expect(html).toContain('id="feature-spec"');
+    expect(html).toContain('Step 2 of 2');
+    expect(html).toContain('<code>/nexus:setup</code>');
   });
 
-  it('renders previous and next links when given neighbours', () => {
-    const html = renderStep(steps[0], { prev: steps[1], next: null });
-    expect(html).toContain('rel="prev" href="#/setup"');
-    expect(html).not.toContain('rel="next"');
+  it('renders the artifact with its kind, number and state badge', () => {
+    const html = renderSteps(steps);
+    expect(html).toContain('PR #1');
+    expect(html).toContain('Issue #2');
+    expect(html).toContain('badge merged">Merged');
+    expect(html).toContain('badge closed">Closed');
   });
 
-  it('renders heading, prose and link', () => {
-    const html = renderStep({ ...steps[0], title: 'T', prose: 'Some prose' });
-    expect(html).toContain('<h1>T</h1>');
-    expect(html).toContain('Some prose');
-    expect(html).toContain('href="https://x.test"');
-    expect(html).toContain('>l</a>');
+  it('escapes text content', () => {
+    const html = renderSteps(steps);
+    expect(html).toContain('Set &lt;up&gt;');
+    expect(html).toContain('Some &lt;b&gt;prose&lt;/b&gt;');
+    expect(html).toContain('chore &amp; more');
   });
+});
 
-  it('escapes prose and link attributes', () => {
-    const html = renderStep({ ...steps[0], prose: '<b>&', link: { label: 'a', href: 'x"y' } });
-    expect(html).toContain('&lt;b&gt;&amp;');
-    expect(html).toContain('href="x&quot;y"');
+describe('renderInstall', () => {
+  it('shows the install commands', () => {
+    const html = renderInstall();
+    expect(html).toContain('/plugin marketplace add soonland/nexus-marketplace');
+    expect(html).toContain('/nexus:setup');
   });
 });

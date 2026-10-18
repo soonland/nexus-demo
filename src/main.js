@@ -1,22 +1,24 @@
 import { steps } from './steps.js';
-import { neighbors, stepForHash } from './router.js';
-import { renderNav, renderStep } from './render.js';
+import { parseHash } from './router.js';
+import { renderHeader, renderHero, renderInstall, renderSteps } from './render.js';
 
-const nav = document.getElementById('nav');
 const content = document.getElementById('content');
+document.getElementById('header').innerHTML = renderHeader();
+content.innerHTML = renderHero(steps) + renderSteps(steps) + renderInstall();
 
-function show() {
-  const step = stepForHash(window.location.hash);
-  nav.innerHTML = renderNav(steps, step.slug);
-  content.innerHTML = renderStep(step, neighbors(step.slug));
-  document.title = `${step.title} · nexus demo`;
+function go() {
+  const slug = parseHash(window.location.hash);
+  const section = slug && document.getElementById(slug);
+  if (section) {
+    section.scrollIntoView();
+    section.focus({ preventScroll: true });
+  } else {
+    window.scrollTo(0, 0);
+  }
 }
 
-window.addEventListener('hashchange', () => {
-  show();
-  content.focus();
-});
-show();
+window.addEventListener('hashchange', go);
+go();
 
 document.querySelector('.skip').addEventListener('click', (event) => {
   event.preventDefault();
