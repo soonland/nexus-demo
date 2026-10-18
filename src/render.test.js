@@ -17,14 +17,30 @@ describe('renderNav', () => {
   it('escapes titles', () => {
     expect(renderNav(steps, 'home')).toContain('Set &lt;up&gt;');
   });
+
+  it('prefers the short nav label', () => {
+    expect(renderNav([{ ...steps[0], nav: 'Overview' }], 'home')).toContain('>Overview</a>');
+  });
 });
 
 describe('renderStep', () => {
+  it('shows the command only for pipeline steps', () => {
+    expect(renderStep(steps[0])).not.toContain('class="command"');
+    expect(renderStep({ ...steps[0], command: '/nexus:setup' })).toContain('<code>/nexus:setup</code>');
+  });
+
+  it('renders previous and next links when given neighbours', () => {
+    const html = renderStep(steps[0], { prev: steps[1], next: null });
+    expect(html).toContain('rel="prev" href="#/setup"');
+    expect(html).not.toContain('rel="next"');
+  });
+
   it('renders heading, prose and link', () => {
     const html = renderStep({ ...steps[0], title: 'T', prose: 'Some prose' });
     expect(html).toContain('<h1>T</h1>');
     expect(html).toContain('Some prose');
-    expect(html).toContain('<a href="https://x.test">l</a>');
+    expect(html).toContain('href="https://x.test"');
+    expect(html).toContain('>l</a>');
   });
 
   it('escapes prose and link attributes', () => {
