@@ -1,28 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { parseHash, stepForHash } from './router.js';
+import { hrefFor, parseHash } from './router.js';
 
 describe('parseHash', () => {
-  it('falls back to home for an empty hash', () => {
-    expect(parseHash('')).toBe('home');
-    expect(parseHash('#')).toBe('home');
+  it('returns nothing for an empty hash', () => {
+    expect(parseHash('')).toEqual({ lang: null, slug: null });
+    expect(parseHash('#')).toEqual({ lang: null, slug: null });
   });
 
-  it('accepts #/slug and #slug', () => {
-    expect(parseHash('#/feature-spec')).toBe('feature-spec');
-    expect(parseHash('#setup')).toBe('setup');
+  it('reads the language and the step', () => {
+    expect(parseHash('#/fr/feature-spec')).toEqual({ lang: 'fr', slug: 'feature-spec' });
+    expect(parseHash('#/en')).toEqual({ lang: 'en', slug: null });
   });
 
-  it('falls back to home for an unknown slug', () => {
-    expect(parseHash('#/nope')).toBe('home');
+  it('still accepts a step with no language', () => {
+    expect(parseHash('#/setup')).toEqual({ lang: null, slug: 'setup' });
+    expect(parseHash('#setup')).toEqual({ lang: null, slug: 'setup' });
+  });
+
+  it('ignores unknown languages and steps', () => {
+    expect(parseHash('#/de/setup')).toEqual({ lang: null, slug: null });
+    expect(parseHash('#/fr/nope')).toEqual({ lang: 'fr', slug: null });
   });
 });
 
-describe('stepForHash', () => {
-  it('returns the matching step', () => {
-    expect(stepForHash('#/merged-pr').slug).toBe('merged-pr');
-  });
-
-  it('returns the home step for an unknown hash', () => {
-    expect(stepForHash('#/nope').slug).toBe('home');
+describe('hrefFor', () => {
+  it('builds language and step links', () => {
+    expect(hrefFor('fr')).toBe('#/fr');
+    expect(hrefFor('en', 'setup')).toBe('#/en/setup');
   });
 });
